@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ЛР №9 — Олово, свинець та їх сполуки</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0c10}
+#app{width:100vw;height:100vh;display:flex;flex-direction:column;font-family:'Segoe UI',Arial,sans-serif}
+#loginWrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0a0c10;z-index:99}
+.lbox{background:#12161e;border:1px solid #222a38;border-radius:16px;padding:36px 40px;width:440px;display:flex;flex-direction:column;gap:18px}
+.lbox h1{font-size:22px;font-weight:700;color:#fff;text-align:center;line-height:1.3}
+.lbox p{font-size:14px;color:#506070;text-align:center;margin-top:-10px}
+.lbox label{font-size:14px;color:#7888a0;font-weight:600}
+.lbox input{padding:12px 16px;border-radius:10px;border:1px solid #222a38;background:#0a0c10;color:#fff;font-size:15px;outline:none}
+.lbox input:focus{border-color:#4070b0}
+.lbox input::placeholder{color:#283040}
+.sbtn{padding:13px;border-radius:10px;background:#1a4a88;border:none;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.sbtn:hover{background:#2860b0}
+#lab{display:none;flex-direction:column;width:100vw;height:100vh}
+.topbar{background:#0a0e16;border-bottom:1px solid #141e28;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar .ttl{font-size:15px;font-weight:700;color:#a8c0d8}
+.ntag{font-size:13px;color:#405060}.ntag b{color:#6888a8}
+.tabrow{display:flex;gap:8px;padding:8px 20px 0;background:#0a0e16;flex-shrink:0}
+.tab{padding:9px 22px;border-radius:9px 9px 0 0;border:1px solid #141e28;border-bottom:none;background:#0a0c10;color:#344858;cursor:pointer;font-size:14px;font-weight:700}
+.tab.on{background:#12161e;color:#a8c0d8;border-color:#1e2e40}
+.panel{display:none;flex-direction:column;flex:1;background:#12161e;min-height:0}
+.panel.on{display:flex}
+.chips{display:flex;gap:8px;padding:10px 18px 0;flex-shrink:0;flex-wrap:wrap;align-items:center}
+.chip{padding:7px 18px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:700;border:2px solid transparent;transition:all .15s;user-select:none}
+.chip-sn{background:#162030;color:#80b0e0;border-color:#204870}
+.chip-pb{background:#18162a;color:#9888d8;border-color:#382868}
+.chip.on{transform:scale(1.07);box-shadow:0 0 12px currentColor}
+.fume-badge{display:inline-block;background:#2a1008;color:#d08040;border:1px solid #603010;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;margin-left:8px}
+.cvwrap{flex:1;position:relative;min-height:0;margin:8px 18px}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap;padding:6px 18px;flex-shrink:0}
+.btn{padding:9px 14px;border-radius:9px;border:1px solid #182030;background:#0c1420;color:#6080a0;cursor:pointer;font-size:13px;font-weight:700;transition:all .15s;white-space:nowrap;user-select:none}
+.btn:hover:not(.dis){background:#101c30;color:#a8c0d8}
+.btn.done{background:#08180a;color:#38a850;border-color:#145020}
+.btn.cur{background:#081828;color:#58a0e0;border-color:#144870;box-shadow:0 0 8px rgba(40,120,230,.35)}
+.btn.dis{opacity:.20;cursor:not-allowed}
+.obs{margin:4px 18px 8px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:500;line-height:1.7;border:1px solid;flex-shrink:0}
+.obs-i{background:#050a14;color:#58a0e0;border-color:#143060}
+.obs-s{background:#050e08;color:#38a850;border-color:#104020}
+.obs-w{background:#140c02;color:#d8a828;border-color:#503808}
+.obs-d{background:#140404;color:#d85040;border-color:#581818}
+.fml{display:inline-block;font-family:'Courier New',monospace;font-size:13px;font-weight:700;background:#040810;padding:6px 14px;border-radius:6px;color:#58c0f8;border:1px solid #0e2840;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="loginWrap">
+  <div class="lbox">
+    <h1>Лабораторна робота №9</h1>
+    <p>Дослідження властивостей олова, свинцю та їх сполук</p>
+    <label>Прізвище та ім'я студента</label>
+    <input id="ni" type="text" placeholder="Іваненко Олег Петрович">
+    <label>Група</label>
+    <input id="gi" type="text" placeholder="ХБ-21">
+    <button class="sbtn" onclick="go()">Розпочати роботу →</button>
+  </div>
+</div>
+<div id="lab">
+  <div class="topbar">
+    <span class="ttl">ЛР №9 — Олово, свинець та їх сполуки</span>
+    <span class="ntag">Студент: <b id="nt"></b> &nbsp;|&nbsp; Група: <b id="gt"></b></span>
+  </div>
+  <div class="tabrow">
+    <div class="tab on" onclick="showP('p1')">Дослід 1: Sn і Pb + HNO₃</div>
+    <div class="tab" onclick="showP('p2')">Дослід 2: Золотий дощ PbI₂</div>
+  </div>
+  <div class="panel on" id="p1">
+    <div class="chips">
+      <div class="chip chip-sn" id="csn" onclick="pickM('sn')">Sn — Олово</div>
+      <div class="chip chip-pb" id="cpb" onclick="pickM('pb')">Pb — Свинець</div>
+      <span class="fume-badge">⚠ Витяжна шафа</span>
+    </div>
+    <div class="cvwrap"><canvas id="c1"></canvas></div>
+    <div class="btnrow" id="br1"></div>
+    <div class="obs obs-i" id="o1">Оберіть метал вище, щоб розпочати дослід.</div>
+  </div>
+  <div class="panel" id="p2">
+    <div class="chips">
+      <span style="font-size:13px;color:#6080a0;font-weight:600">Pb(NO₃)₂ + KI → PbI₂ — «Золотий дощ»</span>
+    </div>
+    <div class="cvwrap"><canvas id="c2"></canvas></div>
+    <div class="btnrow">
+      <div class="btn cur"  id="d1" onclick="s2(1)">1. Налити Pb(NO₃)₂</div>
+      <div class="btn dis"  id="d2" onclick="s2(2)">2. Додати KI → осад PbI₂</div>
+      <div class="btn dis"  id="d3" onclick="s2(3)">3. Нагріти</div>
+      <div class="btn dis"  id="d4" onclick="s2(4)">4. Охолодити</div>
+      <div class="btn dis"  id="d5" onclick="s2(5)">5. Спостереження</div>
+    </div>
+    <div class="obs obs-i" id="o2">Натисніть крок 1 щоб розпочати дослід.</div>
+  </div>
+</div>
+<script>
+var METALS={
+  sn:{sym:'Sn',name:'Олово',col:'#b8c8d8',shine:'#d8e8f4',ox:'#989898',
+    steps:['1. Внести Sn','2. Додати HNO₃','3. Холодна реакція','4. Нагріти','5. Спостереження'],
+    obs:['Шматочок металічного олова у пробірці. Sn — сріблясто-білий метал. Крок 2: додайте конц. HNO₃.',
+      'HNO₃ додано. Крок 3: спостерігайте реакцію на холоді.',
+      '<b>Реакція на холоді!</b> Вже при кімн. T виділяються бурі пари NO₂. Sn реагує з конц. HNO₃ без нагрівання. Крок 4: підігрійте.',
+      '<b>При нагріванні реакція посилюється!</b> Більше NO₂. Sn розчиняється, утворюється <b>білий осад</b> H₂SnO₃. Крок 5: запишіть.',
+      'Реакція завершена.<br><span class="fml">Sn + 4HNO₃(конц.) → H₂SnO₃↓ + 4NO₂↑ + H₂O</span><br>Білий осад — H₂SnO₃. Бурі пари — NO₂!'],
+    cls:['obs-i','obs-i','obs-w','obs-w','obs-s'],
+    coldGas:true,hotPrecip:true},
+  pb:{sym:'Pb',name:'Свинець',col:'#787888',shine:'#a0a0b8',ox:'#606068',
+    steps:['1. Внести Pb','2. Додати HNO₃','3. Холодна реакція','4. Нагріти','5. Спостереження'],
+    obs:['Шматочок металічного свинцю у пробірці. Pb — важкий сірий метал. Крок 2: додайте конц. HNO₃.',
+      'HNO₃ додано. Крок 3: спостерігайте реакцію на холоді.',
+      '<b>На холоді реакція не відбувається.</b> Pb пасивний у конц. HNO₃ при кімн. T — захисний шар оксиду. Крок 4: підігрійте.',
+      '<b>При нагріванні реакція починається!</b> Бурі пари NO₂. Pb розчиняється → безбарвний Pb(NO₃)₂. Крок 5: запишіть.',
+      'Реакція завершена.<br><span class="fml">Pb + 4HNO₃(конц.) → Pb(NO₃)₂ + 2NO₂↑ + 2H₂O</span><br>Безбарвний розчин. Бурі пари NO₂ тільки при нагріванні!'],
+    cls:['obs-i','obs-i','obs-d','obs-w','obs-s'],
+    coldGas:false,hotPrecip:false}
+};
+var OBS2=['Стакан порожній. Натисніть крок 1 — налийте Pb(NO₃)₂.',
+  'Pb(NO₃)₂ налито — <b>безбарвний прозорий розчин</b>. Крок 2: додайте KI по краплях.',
+  '<b>Одразу утворюється яскраво-жовтий дрібний осад PbI₂</b> на дні! Розчин над осадом — безбарвний.<br><span class="fml">Pb(NO₃)₂ + 2KI → PbI₂↓ + 2KNO₃</span><br>Крок 3: нагрійте стакан.',
+  '<b>Осад розчиняється</b> при нагріванні → прозорий гарячий розчин. Крок 4: охолодіть.',
+  'Розчин охолоджується — кристалізація PbI₂. Крок 5: спостерігайте.',
+  '<b>✦ Золотий дощ! ✦</b> Яскраво-жовті блискучі кристали PbI₂ кристалізуються по всьому об\'єму.<br><span class="fml">PbI₂ — різко менш розчинний при охолодженні</span>'];
+var CLS2=['obs-i','obs-i','obs-w','obs-w','obs-i','obs-s'];
+
+var metal=null,st1=0,st2=0,T=0,af1=0,af2=0;
+var gasP=[],cold_rxT=0,heat_rxT=0;
+var s2_addT=0,s2_heatT=0,s2_coolT=0;
+var goldCryst=[];
+
+function go(){
+  var n=document.getElementById('ni').value.trim();
+  if(!n){document.getElementById('ni').style.borderColor='#c44';return;}
+  document.getElementById('nt').textContent=n;
+  document.getElementById('gt').textContent=document.getElementById('gi').value.trim()||'—';
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('lab').style.display='flex';
+  setTimeout(initC1,60);
+}
+function showP(id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on')});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on')});
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('.tab')[id==='p1'?0:1].classList.add('on');
+  if(id==='p1'){cancelAnimationFrame(af2);setTimeout(initC1,40);}
+  else{cancelAnimationFrame(af1);setTimeout(initC2,40);}
+}
+function pickM(m){
+  metal=m;st1=0;gasP=[];cold_rxT=0;heat_rxT=0;
+  ['csn','cpb'].forEach(function(i){document.getElementById(i).classList.remove('on')});
+  document.getElementById(m==='sn'?'csn':'cpb').classList.add('on');
+  buildB1();obs('o1','obs-i',METALS[m].obs[0]);
+}
+function obs(id,cls,html){var e=document.getElementById(id);e.className='obs '+cls;e.innerHTML=html;}
+function buildB1(){
+  if(!metal)return;
+  var row=document.getElementById('br1');row.innerHTML='';
+  METALS[metal].steps.forEach(function(lbl,i){
+    var d=document.createElement('div');d.className='btn'+(i===0?' cur':' dis');
+    d.id='b1_'+(i+1);d.textContent=(i+1)+'. '+lbl;
+    d.onclick=(function(n){return function(){s1(n);};})(i+1);row.appendChild(d);
+  });
+}
+function setB1(n){for(var i=1;i<=5;i++){var e=document.getElementById('b1_'+i);if(e)e.className='btn'+(i<n?' done':i===n?' cur':' dis');}}
+function setB2(n){for(var i=1;i<=5;i++){var e=document.getElementById('d'+i);if(e)e.className='btn'+(i<n?' done':i===n?' cur':' dis');}}
+
+function s1(n){
+  if(!metal){obs('o1','obs-w','Спочатку оберіть метал!');return;}
+  if(n!==st1+1){obs('o1','obs-w','Кроки по порядку! Зараз крок '+(st1+1)+'.');return;}
+  st1=n;if(n<5)setB1(n+1);else setB1(6);
+  if(n===3){cold_rxT=Date.now();gasP=[];}
+  if(n===4)heat_rxT=Date.now();
+  obs('o1',METALS[metal].cls[n-1],METALS[metal].obs[n-1]);
+}
+function s2(n){
+  if(n!==st2+1){obs('o2','obs-w','Кроки по порядку! Зараз крок '+(st2+1)+'.');return;}
+  st2=n;if(n<5)setB2(n+1);else setB2(6);
+  if(n===2){s2_addT=Date.now();}  // KI added — precipitate forms immediately
+  if(n===3)s2_heatT=Date.now();   // heating
+  if(n===4)s2_coolT=Date.now();   // cooling
+  if(n===5)makeGold();            // gold rain observation
+  obs('o2',CLS2[n-1],OBS2[n-1]);
+}
+function makeGold(){
+  goldCryst=[];
+  for(var i=0;i<55;i++){
+    var s=i*7919+3571;
+    goldCryst.push({
+      xf:0.04+((s*37)%10000)/10000*0.92,
+      yf:0.04+((s*13)%10000)/10000*0.90,
+      sz:8+((s*7)%16),          // larger crystals
+      ang:((s*11)%628)/100,
+      br:0.78+((s*17)%220)/1000,
+      delay:((s*3)%32)/8        // shorter delays — faster appearance
+    });
+  }
+}
+
+function fitCV(cv){cv.width=cv.parentElement.clientWidth;cv.height=cv.parentElement.clientHeight;}
+function initC1(){cancelAnimationFrame(af1);var cv=document.getElementById('c1');if(!cv)return;fitCV(cv);(function loop(){T+=0.018;draw1(cv.getContext('2d'),cv.width,cv.height);af1=requestAnimationFrame(loop);})();}
+function initC2(){cancelAnimationFrame(af2);var cv=document.getElementById('c2');if(!cv)return;fitCV(cv);(function loop(){T+=0.018;draw2(cv.getContext('2d'),cv.width,cv.height);af2=requestAnimationFrame(loop);})();}
+
+function bg(ctx,W,H){ctx.fillStyle='#07090e';ctx.fillRect(0,0,W,H);}
+function bch(ctx,W,H){ctx.fillStyle='#12100a';ctx.fillRect(0,H-68,W,68);ctx.fillStyle='#1e1a0e';ctx.fillRect(0,H-72,W,6);}
+
+function tubeDraw(ctx,cx,ty,tw,th,layers){
+  var tx=cx-tw/2,r=tw/2,by=ty+th;
+  ctx.save();
+  function clip(){ctx.beginPath();ctx.moveTo(tx+2,ty);ctx.lineTo(tx+2,by);ctx.arc(cx,by,r-2,Math.PI,0,true);ctx.lineTo(tx+tw-2,ty);ctx.closePath();}
+  if(layers)layers.forEach(function(L){
+    var topY=ty+th*(1-L.f);ctx.save();clip();ctx.clip();
+    ctx.fillStyle=L.c;ctx.fillRect(tx+2,topY,tw-4,by-topY+r);
+    // no inner shimmer line — removed
+    ctx.restore();
+  });
+  ctx.strokeStyle='rgba(168,210,235,0.68)';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(tx,ty+3);ctx.lineTo(tx,by);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tx+tw,ty+3);ctx.lineTo(tx+tw,by);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,by,r,Math.PI,0,true);ctx.stroke();
+  ctx.strokeStyle='rgba(225,248,255,0.28)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(tx+4,ty+12);ctx.lineTo(tx+4,by-12);ctx.stroke();
+  ctx.strokeStyle='rgba(162,208,232,0.55)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tx-2,ty);ctx.lineTo(tx+tw+2,ty);ctx.stroke();
+  ctx.strokeStyle='rgba(162,208,232,0.22)';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(cx,ty,r+2,5,0,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+}
+
+function beakerDraw(ctx,cx,cy,bw,bh){
+  var tp=bw*0.05;
+  ctx.save();ctx.strokeStyle='rgba(168,210,235,0.62)';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(cx-bw/2,cy);ctx.lineTo(cx-bw/2+tp,cy+bh);ctx.lineTo(cx+bw/2-tp,cy+bh);ctx.lineTo(cx+bw/2,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-bw/2-2,cy);ctx.lineTo(cx+bw/2+2,cy);ctx.stroke();
+  ctx.strokeStyle='rgba(225,248,255,0.22)';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(cx-bw/2+8,cy+10);ctx.lineTo(cx-bw/2+tp+4,cy+bh-14);ctx.stroke();
+  ctx.restore();
+}
+function beakerClipPath(ctx,cx,cy,bw,bh){
+  var tp=bw*0.05;ctx.beginPath();
+  ctx.moveTo(cx-bw/2+2,cy);ctx.lineTo(cx-bw/2+tp+2,cy+bh);ctx.lineTo(cx+bw/2-tp-2,cy+bh);ctx.lineTo(cx+bw/2-2,cy);ctx.closePath();
+}
+
+function metalChunk(ctx,cx,cy,m,sc,ox){
+  sc=sc||1;ox=ox||0;var M=METALS[m];
+  var pts=[[0,-16],[9,-12],[15,-4],[14,6],[8,15],[0,17],[-9,14],[-14,4],[-13,-6],[-7,-13]];
+  ctx.save();ctx.translate(cx,cy);ctx.scale(sc,sc);
+  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+  for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.closePath();
+  function ph(h){h=h.replace('#','');return{r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16)};}
+  var bc=ph(M.col),oc=ph(M.ox);
+  ctx.fillStyle='rgb('+Math.round(bc.r+(oc.r-bc.r)*ox)+','+Math.round(bc.g+(oc.g-bc.g)*ox)+','+Math.round(bc.b+(oc.b-bc.b)*ox)+')';ctx.fill();
+  if(ox<0.85){ctx.save();ctx.clip();ctx.globalAlpha=0.5*(1-ox);ctx.fillStyle=M.shine;ctx.beginPath();ctx.ellipse(-4,-5,6,4,0,0,Math.PI*2);ctx.fill();ctx.restore();}
+  ctx.strokeStyle='rgba(255,255,255,'+(0.14*(1-ox))+')';ctx.lineWidth=0.8;ctx.stroke();ctx.restore();
+}
+
+function drop(ctx,x,y,lbl){
+  ctx.save();ctx.fillStyle='rgba(165,208,232,0.45)';ctx.fillRect(x-11,y,24,40);ctx.strokeStyle='rgba(200,232,255,0.20)';ctx.lineWidth=1;ctx.strokeRect(x-11,y,24,40);
+  ctx.fillStyle='rgba(165,208,232,0.45)';ctx.fillRect(x-4,y-14,10,16);
+  ctx.fillStyle='rgba(255,255,255,0.78)';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(lbl,x+1,y+24);ctx.restore();
+}
+function stream(ctx,x1,y1,x2,y2){
+  ctx.strokeStyle='rgba(190,215,238,0.50)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.quadraticCurveTo(x1+(x2-x1)*0.3,y1+10,x2,y2);ctx.stroke();
+}
+
+function burnerDraw(ctx,bx,by,active){
+  ctx.fillStyle='#505058';ctx.fillRect(bx-10,by-46,22,46);
+  ctx.fillStyle='#606068';ctx.fillRect(bx-16,by-5,34,5);
+  ctx.fillStyle='#404048';ctx.fillRect(bx-3,by-80,14,36);
+  ctx.beginPath();ctx.ellipse(bx+4,by-80,10,3.5,0,0,Math.PI*2);ctx.fillStyle='#303038';ctx.fill();
+  if(active){
+    var fh=60+Math.sin(T*3)*5,fw=15+Math.sin(T*2.6)*2.5;
+    for(var l=0;l<3;l++){
+      var sc=1-l*0.27,al=0.90-l*0.27;
+      var tipX=bx+4+Math.sin(T*3.2+l)*2.5,tipY=by-80-fh*sc;
+      ctx.save();ctx.globalAlpha=al;ctx.beginPath();
+      ctx.moveTo(bx+4-fw*sc/2,by-80);ctx.quadraticCurveTo(bx+4-fw*sc*0.7,by-80-fh*sc*0.5,tipX,tipY);
+      ctx.quadraticCurveTo(bx+4+fw*sc*0.7,by-80-fh*sc*0.5,bx+4+fw*sc/2,by-80);
+      ctx.closePath();ctx.fillStyle='rgb(25,60,235)';ctx.fill();ctx.restore();
+    }
+  }
+  ctx.fillStyle='rgba(140,180,210,0.55)';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText('пальник',bx+4,by+14);
+}
+
+function emitNO2(cx,ty,inten){
+  var n=Math.ceil(inten*2);
+  for(var i=0;i<n;i++)if(Math.random()<0.14*inten)
+    gasP.push({x:cx+(Math.random()-0.5)*20,y:ty-Math.random()*6,vx:(Math.random()-0.5)*0.8,vy:-(0.45+Math.random()*1.0),r:5+Math.random()*8,a:0.65,dr:-0.007,dx:Math.random()*0.4-0.2});
+}
+function drawNO2(ctx){
+  for(var i=gasP.length-1;i>=0;i--){
+    var p=gasP[i];p.x+=p.vx+p.dx;p.y+=p.vy;p.r+=0.5;p.a+=p.dr;
+    if(p.a>0){ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(145,78,22,'+p.a.toFixed(2)+')';ctx.fill();}
+    if(p.a<=0)gasP.splice(i,1);
+  }
+}
+
+function fumeHood(ctx,W,H){
+  ctx.save();ctx.strokeStyle='rgba(70,100,130,0.32)';ctx.lineWidth=3;
+  var fw=W*0.84,fh=H*0.80,fx=(W-fw)/2,fy=H*0.03;
+  ctx.strokeRect(fx,fy,fw,fh);
+  ctx.setLineDash([8,4]);ctx.strokeStyle='rgba(100,150,190,0.16)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(fx,fy+fh*0.36);ctx.lineTo(fx+fw,fy+fh*0.36);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(70,100,130,0.48)';ctx.font='bold 11px sans-serif';ctx.textAlign='left';
+  ctx.fillText('ВИТЯЖНА ШАФА',fx+8,fy+14);ctx.restore();
+}
+
+function tubeTongs(ctx,cx,botY,th,bx){
+  var holdY=botY-th*0.40;
+  ctx.save();ctx.strokeStyle='#909098';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(bx-42,botY-th-52);ctx.quadraticCurveTo(cx-18,holdY-18,cx-14,holdY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+16,botY-th-52);ctx.quadraticCurveTo(cx+18,holdY-18,cx+14,holdY);ctx.stroke();
+  ctx.fillStyle='#808088';ctx.beginPath();ctx.arc(bx-13,botY-th-55,7,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function beakerTongs(ctx,cx,cy,bw,bh,bx){
+  var holdY=cy+bh*0.52;
+  ctx.save();ctx.strokeStyle='#909098';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(bx-50,cy-52);ctx.quadraticCurveTo(cx-bw/2-12,holdY-14,cx-bw/2-2,holdY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+16,cy-52);ctx.quadraticCurveTo(cx+bw/2+12,holdY-14,cx+bw/2+2,holdY);ctx.stroke();
+  ctx.fillStyle='#808088';ctx.beginPath();ctx.arc(bx-17,cy-55,7,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+
+function simpleGrip(ctx,cx,cy,bw,bh){
+  // Simple lab tongs — two straight arms from above
+  var gy=cy+bh*0.45;
+  ctx.save();ctx.strokeStyle='rgba(160,162,172,0.85)';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx-bw/2-2,gy);ctx.lineTo(cx-bw/2-2,cy-50);ctx.lineTo(cx-bw/2+20,cy-50);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+bw/2+2,gy);ctx.lineTo(cx+bw/2+2,cy-50);ctx.lineTo(cx+bw/2-20,cy-50);ctx.stroke();
+  ctx.fillStyle='rgba(130,132,142,0.9)';ctx.beginPath();ctx.arc(cx,cy-52,10,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+function heatShimmer(ctx,cx,botY,width){
+  ctx.save();ctx.globalAlpha=0.19+Math.sin(T*5)*0.07;ctx.strokeStyle='rgba(255,138,28,0.58)';ctx.lineWidth=1.2;
+  for(var sh=0;sh<3;sh++){ctx.beginPath();ctx.moveTo(cx-width/2+sh*width/2,botY+5);for(var sw=0;sw<=width;sw+=4)ctx.lineTo(cx-width/2+sw,botY+5+Math.sin(T*7+sw*0.4+sh)*5);ctx.stroke();}
+  ctx.restore();
+}
+
+// ═══════ DRAW 1 ═══════
+function draw1(ctx,W,H){
+  bg(ctx,W,H);fumeHood(ctx,W,H);bch(ctx,W,H);
+  var tw=Math.min(58,W*0.078),th=Math.min(210,H*0.44);
+
+  if(!metal){
+    var sp=Math.min(150,W*0.20);
+    ['sn','pb'].forEach(function(m,i){
+      var tcx=W/2+(i-0.5)*2*sp,ty=H-72-th-22;
+      tubeDraw(ctx,tcx,ty,tw,th,[{c:'rgba(188,212,235,0.17)',f:0.55,s:false}]);
+      metalChunk(ctx,tcx,ty+th-th*0.14,m,0.95,0.06);
+      ctx.fillStyle='rgba(170,205,230,0.82)';ctx.font='bold 16px sans-serif';ctx.textAlign='center';
+      ctx.fillText(METALS[m].sym+' — '+METALS[m].name,tcx,ty-18);
+    });
+    ctx.fillStyle='rgba(88,162,218,0.88)';ctx.font='bold 18px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Оберіть метал вгорі для початку досліду',W/2,H*0.42);
+    return;
+  }
+
+  var M=METALS[metal];
+  var burnerX=W*0.64,burnerY=H-68;
+  var isHot=(st1>=4);
+  var tubeCX=isHot?burnerX:W/2;
+  var tubeTY=isHot?(burnerY-105-th):(H-72-th-22);
+  var botY=tubeTY+th;
+  var coldEl=cold_rxT>0?(Date.now()-cold_rxT)/1000:0;
+  var hotEl=heat_rxT>0?(Date.now()-heat_rxT)/1000:0;
+  var dissF=isHot?Math.min(1,hotEl/8):0;
+
+  var layers=[];
+  if(st1>=2)layers.push({c:'rgba(188,212,235,0.17)',f:0.60,s:false});
+  if(M.hotPrecip&&isHot){var pf=Math.min(1,hotEl/5)*0.30;layers.push({c:'rgba(230,233,230,0.90)',f:pf,s:false});}
+
+  burnerDraw(ctx,burnerX,burnerY,isHot);
+  if(isHot)tubeTongs(ctx,tubeCX,botY,th,burnerX);
+  tubeDraw(ctx,tubeCX,tubeTY,tw,th,layers);
+
+  if(st1>=1&&dissF<1)metalChunk(ctx,tubeCX,botY-th*0.13,metal,Math.max(0.04,1-dissF*0.88),dissF*0.6);
+
+  if(st1===2){
+    drop(ctx,tubeCX+tw/2+28,tubeTY+16,'HNO₃');
+    stream(ctx,tubeCX+tw/2+20,tubeTY+44,tubeCX+6,tubeTY+65);
+  }
+
+  var gasInten=0;
+  if(M.coldGas&&st1>=3)gasInten=0.65+Math.sin(T)*0.15;
+  if(isHot)gasInten=1.0+dissF*0.5;
+  if(gasInten>0){emitNO2(tubeCX,tubeTY,gasInten);drawNO2(ctx);ctx.fillStyle='rgba(200,118,45,0.92)';ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.fillText('↑ бурі пари NO₂',tubeCX,tubeTY-24);}
+
+  if(metal==='pb'&&st1===3){
+    ctx.fillStyle='rgba(225,98,75,0.92)';ctx.font='bold 18px sans-serif';ctx.textAlign='center';
+    ctx.fillText('⊘ Реакція не відбувається на холоді',W/2,H*0.38);
+    ctx.fillStyle='rgba(200,80,58,0.72)';ctx.font='14px sans-serif';
+    ctx.fillText('Pb пасивований конц. HNO₃ при кімн. T',W/2,H*0.38+26);
+  }
+  if(isHot)heatShimmer(ctx,tubeCX,botY,tw);
+  ctx.fillStyle='rgba(138,182,215,0.60)';ctx.font='12px sans-serif';ctx.textAlign='center';
+  ctx.fillText(M.sym+' + HNO₃ конц.',tubeCX,isHot?tubeTY-44:botY+18);
+}
+
+// ═══════ DRAW 2 ═══════
+function draw2(ctx,W,H){
+  bg(ctx,W,H);bch(ctx,W,H);
+  var bw=Math.min(165,W*0.23),bh=Math.min(195,H*0.41);
+  var burnerX=W*0.65,burnerY=H-68;
+  var isHot=(st2===3);
+  var cx=isHot?burnerX:W/2;
+  var cy=isHot?(burnerY-108-bh):(H-72-bh-22);
+  var botY=cy+bh;
+  var hEl=s2_heatT>0?(Date.now()-s2_heatT)/1000:0;
+  var cEl=s2_coolT>0?(Date.now()-s2_coolT)/1000:0;
+  var tp=bw*0.05;
+
+  burnerDraw(ctx,burnerX,burnerY,isHot);
+  if(isHot)simpleGrip(ctx,cx,cy,bw,bh);
+
+  // Fill beaker contents
+  if(st2>=1){
+    var waterTop=cy+bh*0.09;
+    ctx.save();beakerClipPath(ctx,cx,cy,bw,bh);ctx.clip();
+
+    // Base solution — clear
+    ctx.fillStyle='rgba(185,210,232,0.18)';
+    ctx.fillRect(cx-bw/2,waterTop,bw,botY-waterTop);
+
+    // Yellow precipitate (step 3+, not during heating)
+    if(st2>=2){
+      var aEl=s2_addT>0?(Date.now()-s2_addT)/1000:99;
+      var pf2=Math.min(1,aEl/2.5)*0.30;if(pf2<0.28)pf2=0.28;
+      if(isHot){var df=Math.min(1,hEl/5);pf2=pf2*(1-df);}
+      if(st2>=4)pf2=0; // dissolved after heating
+      if(pf2>0.01){
+        var pHt=bh*pf2;
+        // precipitate is dense yellow at bottom
+        ctx.fillStyle='rgba(225,200,10,0.88)';
+        ctx.fillRect(cx-bw/2,botY-pHt,bw,pHt);
+        // grain texture
+        ctx.fillStyle='rgba(245,222,18,0.58)';
+        for(var g=0;g<35;g++){var sd=g*5381,gx=cx-bw/2+4+((sd*37)%(bw-8)),gy=botY-pHt+2+((sd*13)%(pHt-4));if(gy<botY-1){ctx.beginPath();ctx.arc(gx,gy,1.8+((sd*7)%3),0,Math.PI*2);ctx.fill();}}
+      }
+    }
+
+    // Golden crystals — animated gold rain
+    if(st2>=5&&goldCryst.length>0){
+      var wHt=botY-waterTop;
+      goldCryst.forEach(function(cr){
+        // Each crystal falls from top to final position
+        var appear=Math.max(0,cEl-cr.delay);
+        var fallDur=1.2;
+        var fallProg=Math.min(1,appear/fallDur);
+        if(fallProg<=0)return;
+        var crx=cx-bw/2+8+cr.xf*(bw-16);
+        var finalY=waterTop+15+cr.yf*Math.max(0,wHt-30);
+        // Crystal falls from waterTop to finalY
+        var cry=waterTop+fallProg*fallProg*(finalY-waterTop);
+        // Size grows as it crystallises
+        var growProg=Math.min(1,appear/2.0);
+        var sz=(10+cr.sz*0.9)*growProg; // larger crystals
+        var alpha=Math.min(1,appear/0.5);
+        ctx.save();ctx.translate(crx,cry);ctx.rotate(cr.ang+T*0.008*(cr.br-0.85)*3);
+        var b=cr.br;
+        // Main crystal body — bright golden yellow
+        ctx.fillStyle='rgba('+Math.round(238*b)+','+Math.round(200*b)+','+Math.round(12)+','+(0.90*alpha)+')';
+        ctx.beginPath();
+        for(var v=0;v<6;v++){
+          var vx=Math.cos(v*Math.PI/3)*sz,vy=Math.sin(v*Math.PI/3)*sz*0.60;
+          v===0?ctx.moveTo(vx,vy):ctx.lineTo(vx,vy);
+        }
+        ctx.closePath();ctx.fill();
+        // bright specular facet
+        ctx.fillStyle='rgba(255,252,100,'+(0.70*alpha)+')';
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(Math.cos(0.2)*sz*0.85,Math.sin(0.2)*sz*0.85*0.6);
+        ctx.lineTo(Math.cos(1.25)*sz*0.85,Math.sin(1.25)*sz*0.85*0.6);
+        ctx.closePath();ctx.fill();
+        // dark edge for 3D look
+        ctx.strokeStyle='rgba(200,155,5,'+(0.45*alpha)+')';ctx.lineWidth=1;
+        ctx.beginPath();
+        for(var v2=0;v2<6;v2++){
+          var vx2=Math.cos(v2*Math.PI/3)*sz,vy2=Math.sin(v2*Math.PI/3)*sz*0.60;
+          v2===0?ctx.moveTo(vx2,vy2):ctx.lineTo(vx2,vy2);
+        }
+        ctx.closePath();ctx.stroke();
+        ctx.restore();
+      });
+    }
+    ctx.restore();
+
+    // Surface shimmer
+    ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(cx-bw/2+3,waterTop+1);ctx.lineTo(cx+bw/2-3,waterTop+1);ctx.stroke();
+  }
+
+  // Draw beaker glass ON TOP
+  beakerDraw(ctx,cx,cy,bw,bh);
+
+  // Heat shimmer and label
+  if(isHot){
+    heatShimmer(ctx,cx,botY,bw);
+    ctx.fillStyle='rgba(255,155,50,0.88)';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
+    ctx.fillText('нагрівання — осад розчиняється',cx,cy-18);
+  }
+
+  // Ice for cooling
+  if(st2===4){
+    for(var ic=0;ic<6;ic++){var icx=cx-bw/2-38+ic*7,icy=botY-28+ic*5;ctx.fillStyle='rgba(198,230,255,0.38)';ctx.fillRect(icx,icy,17,13);ctx.strokeStyle='rgba(198,230,255,0.22)';ctx.lineWidth=0.5;ctx.strokeRect(icx,icy,17,13);}
+    ctx.fillStyle='rgba(168,215,250,0.78)';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('охолодження...',cx,cy-18);
+  }
+
+  // Golden rain label
+  if(st2>=5&&cEl>2){
+    ctx.fillStyle='rgba(228,198,15,0.95)';ctx.font='bold 20px sans-serif';ctx.textAlign='center';ctx.fillText('✦ Золотий дощ! ✦',cx,cy-26);
+    ctx.fillStyle='rgba(205,178,12,0.75)';ctx.font='13px sans-serif';ctx.fillText('Яскраво-жовті кристали PbI₂',cx,cy-8);
+  }
+
+  // Droppers
+  if(st2===1){drop(ctx,cx-bw/2-42,cy+16,'Pb(NO₃)₂');stream(ctx,cx-bw/2-34,cy+42,cx-bw/4,cy+60);}
+  if(st2===2){drop(ctx,cx+bw/2+38,cy+16,'KI');stream(ctx,cx+bw/2+30,cy+42,cx+8,cy+62);}
+
+  ctx.fillStyle='rgba(138,180,215,0.60)';ctx.font='12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('Pb(NO₃)₂ + 2KI → PbI₂↓ + 2KNO₃',cx,H-72+16);
+}
+
+window.addEventListener('resize',function(){if(document.querySelector('#p1.on')){var cv=document.getElementById('c1');if(cv)fitCV(cv);}else{var cv=document.getElementById('c2');if(cv)fitCV(cv);}});
+</script>
+</body>
+</html>
